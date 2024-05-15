@@ -391,7 +391,7 @@ public class EncodeActivity {
         deviceInfoMesg.setDeviceIndex(DeviceIndex.CREATOR);
         deviceInfoMesg.setManufacturer(Manufacturer.DEVELOPMENT);
         deviceInfoMesg.setProduct((int) productId);
-        deviceInfoMesg.setProductName("FIT Cookbook"); // Max 20 Chars
+        deviceInfoMesg.setProductName("gpxt"); // Max 20 Chars
         deviceInfoMesg.setSerialNumber((long) serialNumber);
         deviceInfoMesg.setSoftwareVersion(softwareVersion);
         deviceInfoMesg.setTimestamp(startTime);
