@@ -5,9 +5,17 @@ import com.garmin.fit.*;
 import com.yangyang5214.gpx2fit.gpx.GpxParser;
 import com.yangyang5214.gpx2fit.model.Point;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+
 
 public class App {
+
+    static int degree = 11930465;
+
     public static void main(String[] args) {
         int argsLen = args.length;
         if (argsLen == 0) {
@@ -30,87 +38,46 @@ public class App {
         try {
             encode = new FileEncoder(new java.io.File("result.fit"), Fit.ProtocolVersion.V2_0);
         } catch (FitRuntimeException e) {
-            System.err.println("Error opening file ExampleActivity.fit");
+            e.printStackTrace();
             return;
         }
 
-        //Generate FileIdMessage
-        FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
-        fileIdMesg.setManufacturer(Manufacturer.DEVELOPMENT);
+        // 写入文件头信息
+        FileIdMesg fileIdMesg = new FileIdMesg();
         fileIdMesg.setType(File.ACTIVITY);
-        fileIdMesg.setProduct(1);
-        fileIdMesg.setSerialNumber(12345L);
+        fileIdMesg.setManufacturer(Manufacturer.DEVELOPMENT);
+        encode.write(fileIdMesg);
 
-        encode.write(fileIdMesg); // Encode the FileIDMesg
-
-        byte[] appId = new byte[]{
-                0x1, 0x1, 0x2, 0x3,
-                0x5, 0x8, 0xD, 0x15,
-                0x22, 0x37, 0x59, (byte) 0x90,
-                (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
-        };
-
-        DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
-        for (int i = 0; i < appId.length; i++) {
-            developerIdMesg.setApplicationId(i, appId[i]);
+        // 写入记录数据
+        for (Point point : points) {
+            RecordMesg record = new RecordMesg();
+            record.setTimestamp(convertToDateTime(point.getTime()));
+            record.setPositionLat((int) (degree * (Double.parseDouble(point.getLat()))));
+            record.setPositionLong((int) (degree * (Double.parseDouble(point.getLon()))));
+            if (point.getEle() != null) {
+                record.setAltitude(Float.parseFloat(point.getEle()));
+            }
+            encode.write(record);
         }
-        developerIdMesg.setDeveloperDataIndex((short) 0);
-        encode.write(developerIdMesg);
 
-        FieldDescriptionMesg fieldDescMesg = new FieldDescriptionMesg();
-        fieldDescMesg.setDeveloperDataIndex((short) 0);
-        fieldDescMesg.setFieldDefinitionNumber((short) 0);
-        fieldDescMesg.setFitBaseTypeId((short) Fit.BASE_TYPE_SINT8);
-        fieldDescMesg.setFieldName(0, "doughnuts_earned");
-        fieldDescMesg.setUnits(0, "doughnuts");
-        encode.write(fieldDescMesg);
-
-        FieldDescriptionMesg hrFieldDescMesg = new FieldDescriptionMesg();
-        hrFieldDescMesg.setDeveloperDataIndex((short) 0);
-        hrFieldDescMesg.setFieldDefinitionNumber((short) 1);
-        hrFieldDescMesg.setFitBaseTypeId((short) Fit.BASE_TYPE_UINT8);
-        hrFieldDescMesg.setFieldName(0, "hr");
-        hrFieldDescMesg.setUnits(0, "bpm");
-        hrFieldDescMesg.setNativeFieldNum((short) RecordMesg.HeartRateFieldNum);
-        encode.write(hrFieldDescMesg);
-
-        RecordMesg record = new RecordMesg();
-        DeveloperField doughnutsEarnedField = new DeveloperField(fieldDescMesg, developerIdMesg);
-        DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
-        record.addDeveloperField(doughnutsEarnedField);
-        record.addDeveloperField(hrDevField);
-
-        record.setHeartRate((short) 140);
-        hrDevField.setValue((short) 140);
-        record.setCadence((short) 88);
-        record.setDistance(510f);
-        record.setSpeed(2800f);
-        doughnutsEarnedField.setValue(1);
-        encode.write(record);
-
-        record.setHeartRate(Fit.UINT8_INVALID);
-        hrDevField.setValue((short) 143);
-        record.setCadence((short) 90);
-        record.setDistance(2080f);
-        record.setSpeed(2920f);
-        doughnutsEarnedField.setValue(2);
-        encode.write(record);
-
-        record.setHeartRate((short) 144);
-        hrDevField.setValue((short) 144);
-        record.setCadence((short) 92);
-        record.setDistance(3710f);
-        record.setSpeed(3050f);
-        doughnutsEarnedField.setValue(3);
-        encode.write(record);
-
+        // 关闭编码器
         try {
             encode.close();
+            System.out.println("FIT file generated successfully!");
         } catch (FitRuntimeException e) {
-            System.err.println("Error closing encode.");
-            return;
+            System.err.println("Error closing encoder.");
         }
+    }
 
-        System.out.println("Encoded FIT file ExampleActivity.fit.");
+    private static DateTime convertToDateTime(String time) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date = sdf.parse(time);
+            return new DateTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
