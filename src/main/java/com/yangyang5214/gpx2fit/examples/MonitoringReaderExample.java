@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-package java.com.yangyang5214.gpx2fit.examples;
+package com.yangyang5214.gpx2fit.examples;
 
 import com.garmin.fit.*;
 import com.garmin.fit.csv.MesgCSVWriter;

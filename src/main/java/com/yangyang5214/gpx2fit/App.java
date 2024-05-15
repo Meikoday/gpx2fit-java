@@ -2,16 +2,30 @@ package com.yangyang5214;
 
 
 import com.garmin.fit.*;
+import com.yangyang5214.gpx2fit.gpx.GpxParser;
+import com.yangyang5214.gpx2fit.model.Point;
 
-import java.util.Calendar;
-import java.util.Random;
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        encodeActivity();
+        int argsLen = args.length;
+        if (argsLen == 0) {
+            System.out.println("java -jar gpx2fit.jar xxx.gpx");
+            return;
+        }
+        String gpxFile = args[0];
+        System.out.format("Start parser gpx %s\n", gpxFile);
+        GpxParser gpxParser = new GpxParser(gpxFile);
+        List<Point> points = gpxParser.parser();
+        if (points == null) {
+            return;
+        }
+        System.out.format("Find point size %d\n", points.size());
+        encodeActivity(points);
     }
 
-    private static void encodeActivity() {
+    private static void encodeActivity(List<Point> points) {
         FileEncoder encode;
         try {
             encode = new FileEncoder(new java.io.File("result.fit"), Fit.ProtocolVersion.V2_0);

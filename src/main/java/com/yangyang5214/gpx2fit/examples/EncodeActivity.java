@@ -5,7 +5,7 @@
 // Transfer (FIT) Protocol License.
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-package java.com.yangyang5214.gpx2fit.examples;
+package com.yangyang5214.gpx2fit.examples;
 
 import com.garmin.fit.ActivityMesg;
 import com.garmin.fit.DateTime;
