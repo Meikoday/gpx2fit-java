@@ -38,9 +38,10 @@ public class Point {
     public float calculateDistance(Point p) {
         double lat1 = lat;
         double lon1 = lon;
-
+        double alt1 = ele;
         double lat2 = p.getLat();
         double lon2 = p.getLon();
+        double alt2 = p.getEle();
 
         double deltaLat = toRadians(lat2 - lat1);
         double deltaLon = toRadians(lon2 - lon1);
@@ -49,10 +50,17 @@ public class Point {
                 Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
                         Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
 
-        double c = (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return (float) (EARTH_RADIUS * c);
+        double horizontalDistance = EARTH_RADIUS * c;
+
+        double deltaAlt = alt2 - alt1;
+
+        double distance = Math.sqrt(horizontalDistance * horizontalDistance + deltaAlt * deltaAlt);
+
+        return (float) distance;
     }
+
 
     public Long subTs(Point p) {
         return time.getTimestamp() - p.time.getTimestamp();
