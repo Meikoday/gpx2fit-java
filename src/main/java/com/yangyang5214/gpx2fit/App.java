@@ -6,6 +6,9 @@ import com.yangyang5214.gpx2fit.gpx.GpxParser;
 import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 
+import java.time.ZoneId;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,8 +155,13 @@ public class App {
         ActivityMesg activityMesg = new ActivityMesg();
         activityMesg.setTimestamp(endTime);
         activityMesg.setNumSessions(1);
-        activityMesg.setLocalTimestamp(endTime.getTimestamp()); //todo
-        activityMesg.setTotalTimerTime((float) (endTime.getTimestamp() - startTime.getTimestamp()));
+
+        ZoneId localZoneId = ZoneId.systemDefault();
+        Instant currentTimestamp = Instant.now();
+        ZonedDateTime localDateTime = currentTimestamp.atZone(localZoneId);
+
+        activityMesg.setLocalTimestamp(endTime.getTimestamp() + localDateTime.getOffset().getTotalSeconds());
+        activityMesg.setTotalTimerTime(session.getTotalTimerTime());
         messages.add(activityMesg);
 
         CreateActivityFile(messages, filename, startTime);
