@@ -13,6 +13,8 @@ public class Session {
     Sport sport;
     DateTime startTime;
     DateTime endTime;
+    float totalTimerTime;
+    float totalDistance;
 
     List<Point> points;
 }

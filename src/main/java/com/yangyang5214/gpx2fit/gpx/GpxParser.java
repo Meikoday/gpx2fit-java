@@ -19,7 +19,6 @@ import java.util.TimeZone;
 
 public class GpxParser {
 
-
     private String xmlFile;
 
     public GpxParser(String xmlFile) {
@@ -39,6 +38,8 @@ public class GpxParser {
             int len = trkpts.getLength();
             points = new ArrayList<>(len);
 
+            float distance = 0;
+
             for (int i = 0; i < len; i++) {
                 Node trkpt = trkpts.item(i);
                 Element trkptElm = (Element) trkpt;
@@ -50,16 +51,20 @@ public class GpxParser {
                 }
 
                 Point point = new Point();
-                point.setLon(trkptElm.getAttribute("lon"));
-                point.setLat(trkptElm.getAttribute("lat"));
+                point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
+                point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
                 point.setTime(convertToDateTime(times.item(0).getTextContent()));
                 NodeList eles = trkptElm.getElementsByTagName("ele");
                 if (eles != null) {
-                    point.setEle(eles.item(0).getTextContent());
+                    point.setEle(Float.parseFloat(eles.item(0).getTextContent()));
                 }
 
-                //todo with extensions
+                if (i != 0) {
+                    distance = distance + point.calculateDistance(points.get(i - 1));
+                }
+                point.setDistance(distance);
 
+                //todo with extensions
                 points.add(point);
             }
 
@@ -68,11 +73,16 @@ public class GpxParser {
             return null;
         }
 
+        DateTime startTime = points.get(0).getTime();
+        DateTime endTime = points.get(points.size() - 1).getTime();
+
         Session session = new Session();
         session.setPoints(points);
-        session.setStartTime(points.get(0).getTime());
-        session.setEndTime(points.get(points.size() - 1).getTime());
+        session.setStartTime(startTime);
+        session.setEndTime(endTime);
         session.setSport(getSport(document));
+        session.setTotalTimerTime(endTime.getTimestamp() - startTime.getTimestamp());
+        session.setTotalDistance(points.get(points.size() - 1).getDistance());
 
         return session;
     }

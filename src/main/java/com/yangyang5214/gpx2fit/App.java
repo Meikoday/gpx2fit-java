@@ -30,6 +30,7 @@ public class App {
             return;
         }
         System.out.format("Find point size %d\n", session.getPoints().size());
+        System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         CreateActivity(session);
     }
 
@@ -47,7 +48,7 @@ public class App {
         // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
         EventMesg eventMesg = new EventMesg();
         eventMesg.setTimestamp(startTime);
-        eventMesg.setEvent(Event.TIMER);
+        eventMesg.setEvent(Event.TIMER); //计时器事件
         eventMesg.setEventType(EventType.START);
         messages.add(eventMesg);
 
@@ -91,13 +92,12 @@ public class App {
             Point point = points.get(i);
             RecordMesg recordMesg = new RecordMesg();
             recordMesg.setTimestamp(point.getTime());
-            recordMesg.setPositionLat((int) (degree * (Double.parseDouble(point.getLat()))));
-            recordMesg.setPositionLong((int) (degree * (Double.parseDouble(point.getLon()))));
+            recordMesg.setPositionLat((int) (degree * (point.getLat())));
+            recordMesg.setPositionLong((int) (degree * (point.getLon())));
             if (point.getEle() != null) {
-                recordMesg.setAltitude(Float.parseFloat(point.getEle()));
+                recordMesg.setAltitude(point.getEle());
             }
-
-//            recordMesg.setDistance((float) i);
+            recordMesg.setDistance((point.getDistance()));
 //            recordMesg.setSpeed((float) 1);
 //            recordMesg.setHeartRate((short) ((Math.sin(twoPI * (0.01 * i + 10)) + 1.0) * 127.0)); // Sine
 //            recordMesg.setCadence((short) (i % 255)); // Sawtooth
@@ -124,8 +124,8 @@ public class App {
         lapMesg.setMessageIndex(0);
         lapMesg.setTimestamp(endTime);
         lapMesg.setStartTime(startTime);
-        lapMesg.setTotalElapsedTime((float) (endTime.getTimestamp() - startTime.getTimestamp()));
-        lapMesg.setTotalTimerTime((float) (endTime.getTimestamp() - startTime.getTimestamp())); //todo
+        lapMesg.setTotalElapsedTime(session.getTotalTimerTime()); //todo
+        lapMesg.setTotalTimerTime(session.getTotalTimerTime());
         messages.add(lapMesg);
 
         // Every FIT ACTIVITY file MUST contain at least one Session message
@@ -133,8 +133,9 @@ public class App {
         sessionMesg.setMessageIndex(0);
         sessionMesg.setTimestamp(startTime);
         sessionMesg.setStartTime(startTime);
-        sessionMesg.setTotalElapsedTime((float) (endTime.getTimestamp() - startTime.getTimestamp()));
-        sessionMesg.setTotalTimerTime((float) (endTime.getTimestamp() - startTime.getTimestamp())); //todo
+        sessionMesg.setTotalDistance(session.getTotalDistance());
+        sessionMesg.setTotalElapsedTime((session.getTotalTimerTime()));
+        sessionMesg.setTotalTimerTime((session.getTotalTimerTime())); //todo
         sessionMesg.setSport(session.getSport());
         sessionMesg.setSubSport(SubSport.GENERIC);
         sessionMesg.setFirstLapIndex(0);
