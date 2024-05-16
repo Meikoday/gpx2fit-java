@@ -1,4 +1,4 @@
-package com.yangyang5214;
+package com.yangyang5214.gpx2fit;
 
 
 import com.garmin.fit.*;
@@ -31,6 +31,8 @@ public class App {
         }
         System.out.format("Find point size %d\n", session.getPoints().size());
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
+        System.out.format(" - totalTimerTime %.2f s\n", session.getTotalTimerTime());
+        System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
         CreateActivity(session);
     }
 
@@ -88,8 +90,7 @@ public class App {
         messages.add(hrFieldDescMesg);
 
 
-        for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
+        for (Point point : points) {
             RecordMesg recordMesg = new RecordMesg();
             recordMesg.setTimestamp(point.getTime());
             recordMesg.setPositionLat((int) (degree * (point.getLat())));
@@ -124,7 +125,7 @@ public class App {
         lapMesg.setMessageIndex(0);
         lapMesg.setTimestamp(endTime);
         lapMesg.setStartTime(startTime);
-        lapMesg.setTotalElapsedTime(session.getTotalTimerTime()); //todo
+        lapMesg.setTotalElapsedTime(session.getTotalElapsedTime()); //todo
         lapMesg.setTotalTimerTime(session.getTotalTimerTime());
         messages.add(lapMesg);
 
@@ -134,8 +135,8 @@ public class App {
         sessionMesg.setTimestamp(startTime);
         sessionMesg.setStartTime(startTime);
         sessionMesg.setTotalDistance(session.getTotalDistance());
-        sessionMesg.setTotalElapsedTime((session.getTotalTimerTime()));
-        sessionMesg.setTotalTimerTime((session.getTotalTimerTime())); //todo
+        sessionMesg.setTotalElapsedTime((session.getTotalElapsedTime()));
+        sessionMesg.setTotalTimerTime((session.getTotalTimerTime()));
         sessionMesg.setSport(session.getSport());
         sessionMesg.setSubSport(SubSport.GENERIC);
         sessionMesg.setFirstLapIndex(0);

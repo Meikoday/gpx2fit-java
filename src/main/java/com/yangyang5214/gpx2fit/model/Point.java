@@ -9,8 +9,8 @@ import lombok.Getter;
 @Setter
 @Getter
 public class Point {
-    Double Lat;
-    Double Lon;
+    Double lat;
+    Double lon;
     Float ele;
     Float distance;
     DateTime time;
@@ -36,8 +36,8 @@ public class Point {
      * @return
      */
     public float calculateDistance(Point p) {
-        double lat1 = Lat;
-        double lon1 = Lon;
+        double lat1 = lat;
+        double lon1 = lon;
 
         double lat2 = p.getLat();
         double lon2 = p.getLon();
@@ -52,5 +52,9 @@ public class Point {
         double c = (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 
         return (float) (EARTH_RADIUS * c);
+    }
+
+    public Long subTs(Point p) {
+        return time.getTimestamp() - p.time.getTimestamp();
     }
 }

@@ -420,9 +420,7 @@ public class EncodeActivity {
         } catch (FitRuntimeException e) {
             System.err.println("Error closing encode.");
             e.printStackTrace();
-            return;
         }
-        System.out.println("Encoded FIT Activity file " + filename);
     }
 
     /**

@@ -19,17 +19,20 @@ import java.util.TimeZone;
 
 public class GpxParser {
 
-    private String xmlFile;
+    private final String xmlFile;
 
     public GpxParser(String xmlFile) {
         this.xmlFile = xmlFile;
     }
 
     public Session parser() {
-        List<Point> points = null;
+        List<Point> points;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        Document document = null;
+        DocumentBuilder db;
+        Document document;
+        float totalTimerTime = 0;
+        float distance = 0;
+
         try {
             db = dbf.newDocumentBuilder();
             document = db.parse(xmlFile);
@@ -38,29 +41,27 @@ public class GpxParser {
             int len = trkpts.getLength();
             points = new ArrayList<>(len);
 
-            float distance = 0;
 
             for (int i = 0; i < len; i++) {
                 Node trkpt = trkpts.item(i);
                 Element trkptElm = (Element) trkpt;
 
                 NodeList times = trkptElm.getElementsByTagName("time");
-                if (times == null) {
-                    System.err.println("not found time attr");
-                    return null;
-                }
 
                 Point point = new Point();
                 point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
                 point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
                 point.setTime(convertToDateTime(times.item(0).getTextContent()));
                 NodeList eles = trkptElm.getElementsByTagName("ele");
-                if (eles != null) {
-                    point.setEle(Float.parseFloat(eles.item(0).getTextContent()));
-                }
+                point.setEle(Float.parseFloat(eles.item(0).getTextContent()));
 
                 if (i != 0) {
-                    distance = distance + point.calculateDistance(points.get(i - 1));
+                    Point prePoint = points.get(i - 1);
+                    float subDistance = point.calculateDistance(prePoint);
+                    distance = distance + subDistance;
+                    if (subDistance != 0) {
+                        totalTimerTime = totalTimerTime + point.subTs(prePoint);
+                    }
                 }
                 point.setDistance(distance);
 
@@ -81,8 +82,9 @@ public class GpxParser {
         session.setStartTime(startTime);
         session.setEndTime(endTime);
         session.setSport(getSport(document));
-        session.setTotalTimerTime(endTime.getTimestamp() - startTime.getTimestamp());
-        session.setTotalDistance(points.get(points.size() - 1).getDistance());
+        session.setTotalTimerTime(totalTimerTime);
+        session.setTotalElapsedTime(endTime.getTimestamp() - startTime.getTimestamp());
+        session.setTotalDistance(distance);
 
         return session;
     }
@@ -103,11 +105,24 @@ public class GpxParser {
         NodeList nodeList = document.getElementsByTagName("trk");
         Element elm = (Element) nodeList.item(0);
         NodeList types = elm.getElementsByTagName("type");
-        if (types == null) {
-            return Sport.CYCLING; //默认自行车
-        }
         Element typeElm = (Element) types.item(0);
+        if (typeElm == null) {
+            return Sport.GENERIC;
+        }
         String type = typeElm.getTextContent();
-        return Sport.valueOf(type.toUpperCase());
+        Sport sport = Sport.GENERIC;
+        try {
+            sport = Sport.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            //可能是中文这里就是枚举了
+            if (type.indexOf("骑行") > 0) {
+                return Sport.CYCLING;
+            }
+            if (type.indexOf("跑步") > 0) {
+                return Sport.RUNNING;
+            }
+            System.err.format("UnKnow type %s\n", type);
+        }
+        return sport;
     }
 }

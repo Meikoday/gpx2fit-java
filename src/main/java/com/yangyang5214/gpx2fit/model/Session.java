@@ -13,7 +13,9 @@ public class Session {
     Sport sport;
     DateTime startTime;
     DateTime endTime;
-    float totalTimerTime;
+
+    float totalTimerTime;   //去除暂停时间
+    float totalElapsedTime; //总时间
     float totalDistance;
 
     List<Point> points;
