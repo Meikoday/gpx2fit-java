@@ -1,6 +1,7 @@
 package com.yangyang5214.gpx2fit.model;
 
 
+import com.garmin.fit.DateTime;
 import lombok.Setter;
 import lombok.Getter;
 
@@ -11,5 +12,5 @@ public class Point {
     String Lat;
     String Lon;
     String ele;
-    String time;
+    DateTime time;
 }

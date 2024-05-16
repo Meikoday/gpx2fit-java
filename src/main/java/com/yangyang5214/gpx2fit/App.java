@@ -4,13 +4,10 @@ package com.yangyang5214;
 import com.garmin.fit.*;
 import com.yangyang5214.gpx2fit.gpx.GpxParser;
 import com.yangyang5214.gpx2fit.model.Point;
+import com.yangyang5214.gpx2fit.model.Session;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import static com.yangyang5214.gpx2fit.examples.EncodeActivity.CreateActivityFile;
 
@@ -28,31 +25,21 @@ public class App {
         String gpxFile = args[0];
         System.out.format("Start parser gpx %s\n", gpxFile);
         GpxParser gpxParser = new GpxParser(gpxFile);
-        List<Point> points = gpxParser.parser();
-        if (points == null) {
+        Session session = gpxParser.parser();
+        if (session == null) {
             return;
         }
-        System.out.format("Find point size %d\n", points.size());
-        CreateActivity(points);
+        System.out.format("Find point size %d\n", session.getPoints().size());
+        CreateActivity(session);
     }
 
-    private static DateTime convertToDateTime(String time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        try {
-            Date date = sdf.parse(time);
-            return new DateTime(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static void CreateActivity(List<Point> points) {
+    public static void CreateActivity(Session session) {
         final String filename = "result.fit";
 
-        DateTime startTime = convertToDateTime(points.get(0).getTime());
-        DateTime endTime = convertToDateTime(points.get(points.size() - 1).getTime());
+        List<Point> points = session.getPoints();
+
+        DateTime startTime = session.getStartTime();
+        DateTime endTime = session.getEndTime();
 
 
         List<Mesg> messages = new ArrayList<Mesg>();
@@ -103,7 +90,7 @@ public class App {
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);
             RecordMesg recordMesg = new RecordMesg();
-            recordMesg.setTimestamp(convertToDateTime(point.getTime()));
+            recordMesg.setTimestamp(point.getTime());
             recordMesg.setPositionLat((int) (degree * (Double.parseDouble(point.getLat()))));
             recordMesg.setPositionLong((int) (degree * (Double.parseDouble(point.getLon()))));
             if (point.getEle() != null) {
@@ -148,7 +135,7 @@ public class App {
         sessionMesg.setStartTime(startTime);
         sessionMesg.setTotalElapsedTime((float) (endTime.getTimestamp() - startTime.getTimestamp()));
         sessionMesg.setTotalTimerTime((float) (endTime.getTimestamp() - startTime.getTimestamp())); //todo
-        sessionMesg.setSport(Sport.STAND_UP_PADDLEBOARDING);
+        sessionMesg.setSport(session.getSport());
         sessionMesg.setSubSport(SubSport.GENERIC);
         sessionMesg.setFirstLapIndex(0);
         sessionMesg.setNumLaps(1);
