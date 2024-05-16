@@ -36,12 +36,16 @@ public class App {
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         System.out.format(" - totalTimerTime %.2f s\n", session.getTotalTimerTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
-        CreateActivity(session);
+
+        String pathname = "result.fit";
+        if (args.length == 2) {
+            pathname = args[1];
+        }
+        System.out.format("Save file to %s\n", pathname);
+        CreateActivity(session, pathname);
     }
 
-    public static void CreateActivity(Session session) {
-        final String filename = "result.fit";
-
+    public static void CreateActivity(Session session, String resultPath) {
         List<Point> points = session.getPoints();
 
         DateTime startTime = session.getStartTime();
@@ -164,6 +168,6 @@ public class App {
         activityMesg.setTotalTimerTime(session.getTotalTimerTime());
         messages.add(activityMesg);
 
-        CreateActivityFile(messages, filename, startTime);
+        CreateActivityFile(messages, resultPath, startTime);
     }
 }
