@@ -53,7 +53,12 @@ public class GpxParser {
                 point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
                 point.setTime(convertToDateTime(times.item(0).getTextContent()));
                 NodeList eles = trkptElm.getElementsByTagName("ele");
-                point.setEle(Float.parseFloat(eles.item(0).getTextContent()));
+                Node elvNode = eles.item(0);
+                if (elvNode != null) {
+                    point.setEle(Float.parseFloat(elvNode.getTextContent()));
+                } else {
+                    point.setEle((float) 0);
+                }
 
                 if (i != 0) {
                     Point prePoint = points.get(i - 1);
@@ -102,15 +107,16 @@ public class GpxParser {
     }
 
     public Sport getSport(Document document) {
+        Sport sport = Sport.CYCLING; //default CYCLING
+
         NodeList nodeList = document.getElementsByTagName("trk");
         Element elm = (Element) nodeList.item(0);
         NodeList types = elm.getElementsByTagName("type");
         Element typeElm = (Element) types.item(0);
         if (typeElm == null) {
-            return Sport.GENERIC;
+            return sport;
         }
         String type = typeElm.getTextContent();
-        Sport sport = Sport.GENERIC;
         try {
             sport = Sport.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {

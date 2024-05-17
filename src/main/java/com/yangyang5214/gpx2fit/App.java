@@ -33,6 +33,7 @@ public class App {
             return;
         }
         System.out.format("Find point size %d\n", session.getPoints().size());
+        System.out.format(" - sport is %s\n", session.getSport().name());
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         System.out.format(" - totalTimerTime %.2f s\n", session.getTotalTimerTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
@@ -64,38 +65,13 @@ public class App {
         // Create the Developer Id message for the developer data fields.
         DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
         // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
-        byte[] appId = new byte[]{
-                0x1, 0x1, 0x2, 0x3,
-                0x5, 0x8, 0xD, 0x15,
-                0x22, 0x37, 0x59, (byte) 0x90,
-                (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
-        };
-
+        byte[] appId = "gpxtgpxtgpxtgpxt".getBytes();
         for (int i = 0; i < appId.length; i++) {
             developerIdMesg.setApplicationId(i, appId[i]);
         }
         developerIdMesg.setDeveloperDataIndex((short) 0);
+        developerIdMesg.setApplicationVersion((long) (1.0 * 100));
         messages.add(developerIdMesg);
-
-        // Create the Developer Data Field Descriptions
-        FieldDescriptionMesg doughnutsFieldDescMesg = new FieldDescriptionMesg();
-        doughnutsFieldDescMesg.setDeveloperDataIndex((short) 0);
-        doughnutsFieldDescMesg.setFieldDefinitionNumber((short) 0);
-        doughnutsFieldDescMesg.setFitBaseTypeId(FitBaseType.FLOAT32);
-        doughnutsFieldDescMesg.setUnits(0, "doughnuts");
-        doughnutsFieldDescMesg.setNativeMesgNum(MesgNum.SESSION);
-        messages.add(doughnutsFieldDescMesg);
-
-        FieldDescriptionMesg hrFieldDescMesg = new FieldDescriptionMesg();
-        hrFieldDescMesg.setDeveloperDataIndex((short) 0);
-        hrFieldDescMesg.setFieldDefinitionNumber((short) 1);
-        hrFieldDescMesg.setFitBaseTypeId(FitBaseType.UINT8);
-        hrFieldDescMesg.setFieldName(0, "Heart Rate");
-        hrFieldDescMesg.setUnits(0, "bpm");
-        hrFieldDescMesg.setNativeFieldNum((short) RecordMesg.HeartRateFieldNum);
-        hrFieldDescMesg.setNativeMesgNum(MesgNum.RECORD);
-        messages.add(hrFieldDescMesg);
-
 
         for (Point point : points) {
             RecordMesg recordMesg = new RecordMesg();
@@ -111,12 +87,6 @@ public class App {
 //            recordMesg.setCadence((short) (i % 255)); // Sawtooth
 //            recordMesg.setPower(((short) (i % 255) < 157 ? 150 : 250)); //Square
 
-            // Add a Developer Field to the Record Message
-//            DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
-//            recordMesg.addDeveloperField(hrDevField);
-//            hrDevField.setValue((short) (Math.sin(twoPI * (.01 * i + 10)) + 1.0) * 127.0);
-
-            // Write the Record message to the output stream
             messages.add(recordMesg);
         }
 
@@ -132,7 +102,7 @@ public class App {
         lapMesg.setMessageIndex(0);
         lapMesg.setTimestamp(endTime);
         lapMesg.setStartTime(startTime);
-        lapMesg.setTotalElapsedTime(session.getTotalElapsedTime()); //todo
+        lapMesg.setTotalElapsedTime(session.getTotalElapsedTime());
         lapMesg.setTotalTimerTime(session.getTotalTimerTime());
         messages.add(lapMesg);
 
@@ -149,11 +119,6 @@ public class App {
         sessionMesg.setFirstLapIndex(0);
         sessionMesg.setNumLaps(1);
         messages.add(sessionMesg);
-
-        // Add a Developer Field to the Session message
-        DeveloperField doughnutsEarnedDevField = new DeveloperField(doughnutsFieldDescMesg, developerIdMesg);
-        doughnutsEarnedDevField.setValue(sessionMesg.getTotalElapsedTime() / 1200.0f);
-        sessionMesg.addDeveloperField(doughnutsEarnedDevField);
 
         // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
         ActivityMesg activityMesg = new ActivityMesg();
