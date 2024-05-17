@@ -18,5 +18,5 @@ java -jar gpx2fit.jar xxx.gpx xxx.fit
 
 ### 支持平台
 
--[x] keep
--[x] 行者
+- [x] keep
+- [x] 行者
