@@ -20,6 +20,13 @@ import java.util.TimeZone;
 public class GpxParser {
 
     private final String xmlFile;
+    private final List<SimpleDateFormat> sdfs = new ArrayList<>();
+
+    {
+        sdfs.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        sdfs.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    }
+
 
     public GpxParser(String xmlFile) {
         this.xmlFile = xmlFile;
@@ -64,7 +71,7 @@ public class GpxParser {
                     Point prePoint = points.get(i - 1);
                     float subDistance = point.calculateDistance(prePoint);
                     distance = distance + subDistance;
-                    if (subDistance != 0) {
+                    if (subDistance > 0.5) {
                         totalTimerTime = totalTimerTime + point.subTs(prePoint);
                     }
                 }
@@ -94,16 +101,16 @@ public class GpxParser {
         return session;
     }
 
-    private DateTime convertToDateTime(String time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        try {
-            Date date = sdf.parse(time);
-            return new DateTime(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+    public DateTime convertToDateTime(String time) {
+        for (int i = 0; i < sdfs.size(); i++) {
+            try {
+                SimpleDateFormat sdf = sdfs.get(i);
+                Date date = sdf.parse(time);
+                return new DateTime(date);
+            } catch (Exception ignored) {
+            }
         }
+        return null;
     }
 
     public Sport getSport(Document document) {
