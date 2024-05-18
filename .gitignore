@@ -4,3 +4,4 @@
 target/
 out/
 *.fit
+dependency-reduced-pom.xml
