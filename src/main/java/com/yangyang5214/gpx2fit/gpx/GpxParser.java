@@ -72,7 +72,10 @@ public class GpxParser {
                     float subDistance = point.calculateDistance(prePoint);
                     distance = distance + subDistance;
                     if (subDistance > 0.5) {
-                        totalMovingTime = totalMovingTime + point.subTs(prePoint);
+                        long subTs = point.subTs(prePoint);
+                        if (subTs < 10) { //比较宽泛
+                            totalMovingTime = totalMovingTime + subTs;
+                        }
                     }
                 }
                 point.setDistance(distance);
