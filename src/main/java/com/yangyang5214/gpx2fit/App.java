@@ -37,6 +37,8 @@ public class App {
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         System.out.format(" - totalMovingTime %.2f s\n", session.getTotalMovingTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
+        System.out.format(" - totalAscent %d \n", session.getTotalAscent());
+        System.out.format(" - totalDescent %d \n", session.getTotalDescent());
 
         String pathname = "result.fit";
         if (args.length == 2) {
@@ -122,6 +124,10 @@ public class App {
         sessionMesg.setSubSport(SubSport.GENERIC);
         sessionMesg.setFirstLapIndex(0);
         sessionMesg.setNumLaps(1);
+
+        sessionMesg.setTotalAscent(session.getTotalAscent());
+        sessionMesg.setTotalDescent(session.getTotalDescent());
+
         messages.add(sessionMesg);
 
         // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message

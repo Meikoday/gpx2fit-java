@@ -29,12 +29,11 @@ public class Point {
         return degrees * (Math.PI / 180);
     }
 
-    /**
-     * 计算两个点之间的距离
-     *
-     * @param p
-     * @return
-     */
+    public float calculateEle(Point p) {
+        return ele - p.ele;
+    }
+
+
     public float calculateDistance(Point p) {
         double lat1 = lat;
         double lon1 = lon;
