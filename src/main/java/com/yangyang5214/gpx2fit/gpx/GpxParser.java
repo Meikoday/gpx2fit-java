@@ -37,7 +37,7 @@ public class GpxParser {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document document;
-        float totalTimerTime = 0;
+        float totalMovingTime = 0;
         float distance = 0;
 
         try {
@@ -72,7 +72,7 @@ public class GpxParser {
                     float subDistance = point.calculateDistance(prePoint);
                     distance = distance + subDistance;
                     if (subDistance > 0.5) {
-                        totalTimerTime = totalTimerTime + point.subTs(prePoint);
+                        totalMovingTime = totalMovingTime + point.subTs(prePoint);
                     }
                 }
                 point.setDistance(distance);
@@ -94,7 +94,7 @@ public class GpxParser {
         session.setStartTime(startTime);
         session.setEndTime(endTime);
         session.setSport(getSport(document));
-        session.setTotalTimerTime(totalTimerTime);
+        session.setTotalMovingTime(totalMovingTime);
         session.setTotalElapsedTime(endTime.getTimestamp() - startTime.getTimestamp());
         session.setTotalDistance(distance);
 

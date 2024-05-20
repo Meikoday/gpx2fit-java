@@ -14,7 +14,7 @@ public class Session {
     DateTime startTime;
     DateTime endTime;
 
-    float totalTimerTime;   //去除暂停时间
+    float totalMovingTime;   //移动时间
     float totalElapsedTime; //总时间
     float totalDistance;
 

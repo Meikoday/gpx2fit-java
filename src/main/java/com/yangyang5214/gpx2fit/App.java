@@ -35,7 +35,7 @@ public class App {
         System.out.format("Find point size %d\n", session.getPoints().size());
         System.out.format(" - sport is %s\n", session.getSport().name());
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
-        System.out.format(" - totalTimerTime %.2f s\n", session.getTotalTimerTime());
+        System.out.format(" - totalMovingTime %.2f s\n", session.getTotalMovingTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
 
         String pathname = "result.fit";
@@ -103,7 +103,8 @@ public class App {
         lapMesg.setTimestamp(endTime);
         lapMesg.setStartTime(startTime);
         lapMesg.setTotalElapsedTime(session.getTotalElapsedTime());
-        lapMesg.setTotalTimerTime(session.getTotalTimerTime());
+        lapMesg.setTotalMovingTime(session.getTotalMovingTime());
+        lapMesg.setTotalTimerTime(session.getTotalMovingTime());
         messages.add(lapMesg);
 
         // Every FIT ACTIVITY file MUST contain at least one Session message
@@ -112,8 +113,11 @@ public class App {
         sessionMesg.setTimestamp(startTime);
         sessionMesg.setStartTime(startTime);
         sessionMesg.setTotalDistance(session.getTotalDistance());
+
         sessionMesg.setTotalElapsedTime((session.getTotalElapsedTime()));
-        sessionMesg.setTotalTimerTime((session.getTotalTimerTime()));
+        sessionMesg.setTotalMovingTime((session.getTotalMovingTime()));
+        sessionMesg.setTotalTimerTime((session.getTotalMovingTime()));
+
         sessionMesg.setSport(session.getSport());
         sessionMesg.setSubSport(SubSport.GENERIC);
         sessionMesg.setFirstLapIndex(0);
@@ -129,8 +133,9 @@ public class App {
         Instant currentTimestamp = Instant.now();
         ZonedDateTime localDateTime = currentTimestamp.atZone(localZoneId);
 
-        activityMesg.setLocalTimestamp(endTime.getTimestamp() + localDateTime.getOffset().getTotalSeconds());
-        activityMesg.setTotalTimerTime(session.getTotalTimerTime());
+        long totalTime = endTime.getTimestamp() + localDateTime.getOffset().getTotalSeconds();
+        activityMesg.setLocalTimestamp(totalTime);
+        activityMesg.setTotalTimerTime(session.getTotalMovingTime());
         messages.add(activityMesg);
 
         CreateActivityFile(messages, resultPath, startTime);
