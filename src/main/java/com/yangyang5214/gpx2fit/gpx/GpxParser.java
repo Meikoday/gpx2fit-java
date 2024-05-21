@@ -10,12 +10,12 @@ import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 import org.w3c.dom.*;
 
-import java.text.ParseException;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 public class GpxParser {
 
@@ -70,6 +70,15 @@ public class GpxParser {
                     point.setEle((float) 0);
                 }
 
+                NodeList extensions = trkptElm.getElementsByTagName("extensions");
+                if (extensions.getLength() > 0) {
+                    Element extNode = (Element) extensions.item(0);
+                    String hr = getTagByName(extNode, "ns3:hr");
+                    if (hr != null) {
+                        point.setHr(Short.parseShort(hr));
+                    }
+                }
+
                 if (i != 0) {
                     Point prePoint = points.get(i - 1);
                     float subDistance = point.calculateDistance(prePoint);
@@ -115,6 +124,15 @@ public class GpxParser {
         session.setTotalDescent(-(int) totalDecent);
 
         return session;
+    }
+
+    public String getTagByName(Element element, String tag) {
+        NodeList node = element.getElementsByTagName(tag);
+        if (node.getLength() == 0) {
+            return null;
+        }
+        Element ele = (Element) node.item(0);
+        return ele.getTextContent();
     }
 
     public DateTime convertToDateTime(String time) {

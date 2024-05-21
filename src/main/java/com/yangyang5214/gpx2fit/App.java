@@ -84,6 +84,7 @@ public class App {
                 recordMesg.setAltitude(point.getEle());
             }
             recordMesg.setDistance((point.getDistance()));
+            recordMesg.setHeartRate(point.getHr());
 //            recordMesg.setSpeed((float) 1);
 //            recordMesg.setHeartRate((short) ((Math.sin(twoPI * (0.01 * i + 10)) + 1.0) * 127.0)); // Sine
 //            recordMesg.setCadence((short) (i % 255)); // Sawtooth
