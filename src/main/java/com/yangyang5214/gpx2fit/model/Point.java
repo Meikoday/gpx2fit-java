@@ -17,6 +17,8 @@ public class Point {
 
     short hr;
 
+    int calories;
+
 
     //地球平均半径，单位：公里
     private static final float EARTH_RADIUS = 6371.00F * 1000;

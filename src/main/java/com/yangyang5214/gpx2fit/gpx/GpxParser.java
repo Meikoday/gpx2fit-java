@@ -73,9 +73,15 @@ public class GpxParser {
                 NodeList extensions = trkptElm.getElementsByTagName("extensions");
                 if (extensions.getLength() > 0) {
                     Element extNode = (Element) extensions.item(0);
+
                     String hr = getTagByName(extNode, "ns3:hr");
                     if (hr != null) {
                         point.setHr(Short.parseShort(hr));
+                    }
+
+                    String cad = getTagByName(extNode, "ns3:cad");
+                    if (cad != null) {
+                        point.setCalories(Integer.parseInt(cad));
                     }
                 }
 
