@@ -20,3 +20,4 @@ java -jar gpx2fit.jar xxx.gpx xxx.fit
 
 - [x] keep
 - [x] 行者
+- [x] Strava
