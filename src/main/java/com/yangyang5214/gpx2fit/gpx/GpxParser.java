@@ -10,9 +10,7 @@ import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 import org.w3c.dom.*;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +79,7 @@ public class GpxParser {
 
                     String cad = getTagByName(extNode, "ns3:cad");
                     if (cad != null) {
-                        point.setCalories(Integer.parseInt(cad));
+                        point.setCadence(Short.parseShort(cad));
                     }
                 }
 
@@ -142,10 +140,9 @@ public class GpxParser {
     }
 
     public DateTime convertToDateTime(String time) {
-        for (int i = 0; i < sdfs.size(); i++) {
+        for (SimpleDateFormat simpleDateFormat : sdfs) {
             try {
-                SimpleDateFormat sdf = sdfs.get(i);
-                Date date = sdf.parse(time);
+                Date date = simpleDateFormat.parse(time);
                 return new DateTime(date);
             } catch (Exception ignored) {
             }

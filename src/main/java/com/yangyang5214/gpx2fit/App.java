@@ -85,7 +85,7 @@ public class App {
             }
             recordMesg.setDistance((point.getDistance()));
             recordMesg.setHeartRate(point.getHr());
-            recordMesg.setCalories(point.getCalories());
+            recordMesg.setCadence(point.getCadence());
 //            recordMesg.setSpeed((float) 1);
 //            recordMesg.setHeartRate((short) ((Math.sin(twoPI * (0.01 * i + 10)) + 1.0) * 127.0)); // Sine
 //            recordMesg.setCadence((short) (i % 255)); // Sawtooth
