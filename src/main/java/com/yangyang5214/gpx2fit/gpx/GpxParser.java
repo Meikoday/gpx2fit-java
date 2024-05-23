@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.Sport;
+import com.sun.org.apache.xerces.internal.dom.AttributeMap;
 import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 import org.w3c.dom.*;
@@ -30,11 +31,32 @@ public class GpxParser {
         this.xmlFile = xmlFile;
     }
 
+
+    public String getPointExtNs(Document document) {
+        NodeList nodes = document.getElementsByTagName("gpx");
+        if (nodes.getLength() == 0) {
+            return null;
+        }
+        NamedNodeMap attributes = nodes.item(0).getAttributes();
+        if (attributes.getLength() == 0) {
+            return null;
+        }
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node node = attributes.item(i);
+            String textContent = node.getTextContent();
+            if (textContent.contains("TrackPointExtension")) {
+                return node.getNodeName().split(":")[1];
+            }
+        }
+        return null;
+    }
+
     public Session parser() {
         List<Point> points;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
         Document document;
+        String pointExtNs;
 
         float totalMovingTime = 0;
         float distance = 0;
@@ -44,6 +66,9 @@ public class GpxParser {
         try {
             db = dbf.newDocumentBuilder();
             document = db.parse(xmlFile);
+
+            pointExtNs = getPointExtNs(document);
+
             NodeList trkpts = document.getElementsByTagName("trkpt");
 
             int len = trkpts.getLength();
@@ -72,12 +97,12 @@ public class GpxParser {
                 if (extensions.getLength() > 0) {
                     Element extNode = (Element) extensions.item(0);
 
-                    String hr = getTagByName(extNode, "ns3:hr");
+                    String hr = getTagByName(extNode, pointExtNs, "hr");
                     if (hr != null) {
                         point.setHr(Short.parseShort(hr));
                     }
 
-                    String cad = getTagByName(extNode, "ns3:cad");
+                    String cad = getTagByName(extNode, pointExtNs, "cad");
                     if (cad != null) {
                         point.setCadence(Short.parseShort(cad));
                     }
@@ -130,8 +155,11 @@ public class GpxParser {
         return session;
     }
 
-    public String getTagByName(Element element, String tag) {
-        NodeList node = element.getElementsByTagName(tag);
+    public String getTagByName(Element element, String pointExtNs, String tag) {
+        if (pointExtNs == null) {
+            return null;
+        }
+        NodeList node = element.getElementsByTagName(pointExtNs + ":" + tag);
         if (node.getLength() == 0) {
             return null;
         }
