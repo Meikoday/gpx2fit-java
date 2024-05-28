@@ -148,10 +148,6 @@ public class GpxParser {
         session.setTotalMovingTime(totalMovingTime);
         session.setTotalElapsedTime(endTime.getTimestamp() - startTime.getTimestamp());
         session.setTotalDistance(distance);
-
-        session.setTotalAscent((int) totalAscent);
-        session.setTotalDescent(-(int) totalDecent);
-
         return session;
     }
 
