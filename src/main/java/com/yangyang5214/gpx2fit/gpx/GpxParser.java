@@ -6,7 +6,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.Sport;
-import com.sun.org.apache.xerces.internal.dom.AttributeMap;
 import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 import org.w3c.dom.*;
@@ -60,8 +59,6 @@ public class GpxParser {
 
         float totalMovingTime = 0;
         float distance = 0;
-        float totalAscent = 0;
-        float totalDecent = 0;
 
         try {
             db = dbf.newDocumentBuilder();
@@ -85,13 +82,9 @@ public class GpxParser {
                 point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
                 point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
                 point.setTime(convertToDateTime(times.item(0).getTextContent()));
-                NodeList eles = trkptElm.getElementsByTagName("ele");
-                Node elvNode = eles.item(0);
-                if (elvNode != null) {
-                    point.setEle(Float.parseFloat(elvNode.getTextContent()));
-                } else {
-                    point.setEle((float) 0);
-                }
+
+                point.setEle(parserEle(trkptElm));
+                point.setSpeed(parserSpeed(trkptElm));
 
                 NodeList extensions = trkptElm.getElementsByTagName("extensions");
                 if (extensions.getLength() > 0) {
@@ -117,13 +110,6 @@ public class GpxParser {
                         if (subTs < 10) { //比较宽泛
                             totalMovingTime = totalMovingTime + subTs;
                         }
-                    }
-
-                    float subEle = point.calculateEle(prePoint);
-                    if (subEle > 0) {
-                        totalAscent = totalAscent + subEle;
-                    } else {
-                        totalDecent = totalDecent + subEle;
                     }
                 }
                 point.setDistance(distance);
@@ -172,6 +158,26 @@ public class GpxParser {
             }
         }
         return null;
+    }
+
+    public Float parserEle(Element trkptElm) {
+        NodeList eles = trkptElm.getElementsByTagName("ele");
+        Node elvNode = eles.item(0);
+        if (elvNode != null) {
+            return Float.parseFloat(elvNode.getTextContent());
+        } else {
+            return (float) 0;
+        }
+    }
+
+    public Float parserSpeed(Element trkptElm) {
+        NodeList eles = trkptElm.getElementsByTagName("speed");
+        Node elvNode = eles.item(0);
+        if (elvNode != null) {
+            return Float.parseFloat(elvNode.getTextContent());
+        } else {
+            return (float) 0;
+        }
     }
 
     public Sport getSport(Document document) {

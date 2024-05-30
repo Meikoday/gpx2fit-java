@@ -78,15 +78,12 @@ public class App {
             recordMesg.setTimestamp(point.getTime());
             recordMesg.setPositionLat((int) (degree * (point.getLat())));
             recordMesg.setPositionLong((int) (degree * (point.getLon())));
-            if (point.getEle() != null) {
-                recordMesg.setAltitude(point.getEle());
-            }
+            recordMesg.setAltitude(point.getEle());
+//            recordMesg.setEnhancedAltitude(point.getEle());
             recordMesg.setDistance((point.getDistance()));
             recordMesg.setHeartRate(point.getHr());
             recordMesg.setCadence(point.getCadence());
-//            recordMesg.setSpeed((float) 1);
-//            recordMesg.setHeartRate((short) ((Math.sin(twoPI * (0.01 * i + 10)) + 1.0) * 127.0)); // Sine
-//            recordMesg.setCadence((short) (i % 255)); // Sawtooth
+            recordMesg.setSpeed(point.getSpeed());
 //            recordMesg.setPower(((short) (i % 255) < 157 ? 150 : 250)); //Square
 
             messages.add(recordMesg);

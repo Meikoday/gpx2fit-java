@@ -14,6 +14,7 @@ public class Point {
     Float ele;
     Float distance;
     DateTime time;
+    Float speed;
 
     short hr;
     short cadence;
@@ -21,20 +22,9 @@ public class Point {
     //地球平均半径，单位：公里
     private static final float EARTH_RADIUS = 6371.00F * 1000;
 
-    /**
-     * 将角度转换为弧度
-     *
-     * @param degrees
-     * @return
-     */
     private static double toRadians(double degrees) {
         return degrees * (Math.PI / 180);
     }
-
-    public float calculateEle(Point p) {
-        return ele - p.ele;
-    }
-
 
     public float calculateDistance(Point p) {
         double lat1 = lat;
