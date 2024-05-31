@@ -105,13 +105,13 @@ public class GpxParser {
                     Point prePoint = points.get(i - 1);
                     float subDistance = point.calculateDistance(prePoint);
                     distance = distance + subDistance;
-                    if (subDistance > 0.5) {
-                        long subTs = point.subTs(prePoint);
-                        if (subTs < 10) { //比较宽泛
-                            totalMovingTime = totalMovingTime + subTs;
-                        }
+                    long subTs = point.subTs(prePoint);
+
+                    if (subTs < 60) {
+                        totalMovingTime = totalMovingTime + subTs;
                     }
                 }
+
                 point.setDistance(distance);
 
                 //todo with extensions
@@ -200,6 +200,9 @@ public class GpxParser {
             }
             if (type.indexOf("跑步") > 0) {
                 return Sport.RUNNING;
+            }
+            if (type.indexOf("徒步") > 0) {
+                return Sport.WALKING;
             }
             System.err.format("UnKnow type %s\n", type);
         }
