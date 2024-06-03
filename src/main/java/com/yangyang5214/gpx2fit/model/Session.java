@@ -18,5 +18,8 @@ public class Session {
     float totalElapsedTime; //总时间
     float totalDistance;
 
+    float totalAscent; //总爬升
+    float totalDescent; //总下降
+
     List<Point> points;
 }

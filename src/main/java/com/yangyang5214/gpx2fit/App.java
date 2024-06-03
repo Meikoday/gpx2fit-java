@@ -37,6 +37,8 @@ public class App {
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         System.out.format(" - totalMovingTime %.2f s\n", session.getTotalMovingTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
+        System.out.format(" - totalAscent %.2f s\n", session.getTotalAscent());
+        System.out.format(" - totalDescent %.2f s\n", session.getTotalDescent());
 
         String pathname = "result.fit";
         if (args.length == 2) {
@@ -79,7 +81,7 @@ public class App {
             recordMesg.setPositionLat((int) (degree * (point.getLat())));
             recordMesg.setPositionLong((int) (degree * (point.getLon())));
             recordMesg.setAltitude(point.getEle());
-//            recordMesg.setEnhancedAltitude(point.getEle());
+            recordMesg.setEnhancedAltitude(point.getEle());
             recordMesg.setDistance((point.getDistance()));
             recordMesg.setHeartRate(point.getHr());
             recordMesg.setCadence(point.getCadence());
@@ -104,6 +106,8 @@ public class App {
         lapMesg.setTotalElapsedTime(session.getTotalElapsedTime());
         lapMesg.setTotalMovingTime(session.getTotalMovingTime());
         lapMesg.setTotalTimerTime(session.getTotalMovingTime());
+        lapMesg.setTotalAscent((int) session.getTotalAscent());
+        lapMesg.setTotalDescent((int) session.getTotalDescent());
         messages.add(lapMesg);
 
         // Every FIT ACTIVITY file MUST contain at least one Session message

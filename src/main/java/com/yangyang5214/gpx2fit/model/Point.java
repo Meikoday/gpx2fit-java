@@ -56,4 +56,8 @@ public class Point {
     public Long subTs(Point p) {
         return time.getTimestamp() - p.time.getTimestamp();
     }
+
+    public float subEle(Point p) {
+        return p.ele - ele;
+    }
 }

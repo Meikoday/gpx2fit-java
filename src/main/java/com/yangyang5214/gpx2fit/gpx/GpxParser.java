@@ -139,7 +139,26 @@ public class GpxParser {
         session.setTotalMovingTime(totalMovingTime);
         session.setTotalElapsedTime(endTime.getTimestamp() - startTime.getTimestamp());
         session.setTotalDistance(distance);
+        calTotalAscent(points, session);
         return session;
+    }
+
+    public void calTotalAscent(List<Point> points, Session session) {
+        float totalAscent = 0;
+        float totalDescent = 0;
+        int step = 8;
+        for (int i = step; i < points.size(); i += step) {
+            Point cur = points.get(i);
+            Point pre = points.get(i - step);
+            float subEle = cur.subEle(pre);
+            if (subEle > 0) {
+                totalAscent = totalAscent + subEle;
+            } else {
+                totalDescent = totalDescent + subEle;
+            }
+        }
+        session.setTotalAscent(totalAscent);
+        session.setTotalDescent(totalDescent);
     }
 
     public String getTagByName(Element element, String pointExtNs, String... tags) {
