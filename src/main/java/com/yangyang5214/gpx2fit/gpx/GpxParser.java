@@ -95,9 +95,14 @@ public class GpxParser {
                         point.setHr(Short.parseShort(hr));
                     }
 
-                    String cad = getTagByName(extNode, pointExtNs, "cad");
+                    String cad = getTagByName(extNode, pointExtNs, "cad", "cadence");
                     if (cad != null) {
                         point.setCadence(Short.parseShort(cad));
+                    }
+
+                    String speed = getTagByName(extNode, pointExtNs, "speed");
+                    if (speed != null) {
+                        point.setSpeed(Float.parseFloat(speed));
                     }
                 }
 
@@ -137,16 +142,19 @@ public class GpxParser {
         return session;
     }
 
-    public String getTagByName(Element element, String pointExtNs, String tag) {
+    public String getTagByName(Element element, String pointExtNs, String... tags) {
         if (pointExtNs == null) {
             return null;
         }
-        NodeList node = element.getElementsByTagName(pointExtNs + ":" + tag);
-        if (node.getLength() == 0) {
-            return null;
+        for (String tag : tags) {
+            NodeList node = element.getElementsByTagName(pointExtNs + ":" + tag);
+            if (node.getLength() == 0) {
+                continue;
+            }
+            Element ele = (Element) node.item(0);
+            return ele.getTextContent();
         }
-        Element ele = (Element) node.item(0);
-        return ele.getTextContent();
+        return null;
     }
 
     public DateTime convertToDateTime(String time) {
