@@ -6,7 +6,7 @@
 
     <groupId>org.yangyang5214</groupId>
     <artifactId>gpx2fit</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
 
     <dependencies>
         <dependency>
