@@ -92,17 +92,26 @@ public class GpxParser {
 
                     String hr = getTagByName(extNode, pointExtNs, "hr");
                     if (hr != null) {
-                        point.setHr(Short.parseShort(hr));
+                        try {
+                            point.setHr(Short.parseShort(hr));
+                        } catch (NumberFormatException ignore) {
+                        }
                     }
 
                     String cad = getTagByName(extNode, pointExtNs, "cad", "cadence");
                     if (cad != null) {
-                        point.setCadence(Short.parseShort(cad));
+                        try {
+                            point.setCadence(Short.parseShort(cad));
+                        } catch (NumberFormatException ignore) {
+                        }
                     }
 
                     String speed = getTagByName(extNode, pointExtNs, "speed");
                     if (speed != null) {
-                        point.setSpeed(Float.parseFloat(speed));
+                        try {
+                            point.setSpeed(Float.parseFloat(speed));
+                        } catch (NumberFormatException ignore) {
+                        }
                     }
                 }
 

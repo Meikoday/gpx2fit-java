@@ -37,8 +37,8 @@ public class App {
         System.out.format(" - distance %.2f km\n", session.getTotalDistance() / 1000);
         System.out.format(" - totalMovingTime %.2f s\n", session.getTotalMovingTime());
         System.out.format(" - totalElapsedTime %.2f s\n", session.getTotalElapsedTime());
-        System.out.format(" - totalAscent %.2f s\n", session.getTotalAscent());
-        System.out.format(" - totalDescent %.2f s\n", session.getTotalDescent());
+        System.out.format(" - totalAscent %.2f m\n", session.getTotalAscent());
+        System.out.format(" - totalDescent %.2f ms\n", session.getTotalDescent());
 
         String pathname = "result.fit";
         if (args.length == 2) {
