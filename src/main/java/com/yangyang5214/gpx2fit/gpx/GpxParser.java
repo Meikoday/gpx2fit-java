@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class GpxParser {
 
@@ -199,7 +200,7 @@ public class GpxParser {
     public Float parserEle(Element trkptElm) {
         NodeList eles = trkptElm.getElementsByTagName("ele");
         Node elvNode = eles.item(0);
-        if (elvNode != null) {
+        if (elvNode != null && !Objects.equals(elvNode.getTextContent(), "")) {
             return Float.parseFloat(elvNode.getTextContent());
         } else {
             return (float) 0;
@@ -208,9 +209,9 @@ public class GpxParser {
 
     public Float parserSpeed(Element trkptElm) {
         NodeList eles = trkptElm.getElementsByTagName("speed");
-        Node elvNode = eles.item(0);
-        if (elvNode != null) {
-            return Float.parseFloat(elvNode.getTextContent());
+        Node speedNode = eles.item(0);
+        if (speedNode != null && !Objects.equals(speedNode.getTextContent(), "")) {
+            return Float.parseFloat(speedNode.getTextContent());
         } else {
             return (float) 0;
         }
