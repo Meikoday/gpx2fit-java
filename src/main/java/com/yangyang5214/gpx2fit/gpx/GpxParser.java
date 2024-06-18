@@ -51,7 +51,7 @@ public class GpxParser {
         return null;
     }
 
-    public Session parser() {
+    public Session parser() throws Exception {
         List<Point> points;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -61,81 +61,90 @@ public class GpxParser {
         float totalMovingTime = 0;
         float distance = 0;
 
-        try {
-            db = dbf.newDocumentBuilder();
-            document = db.parse(xmlFile);
+        db = dbf.newDocumentBuilder();
+        document = db.parse(xmlFile);
 
-            pointExtNs = getPointExtNs(document);
+        pointExtNs = getPointExtNs(document);
 
-            NodeList trkpts = document.getElementsByTagName("trkpt");
+        NodeList trkpts = document.getElementsByTagName("trkpt");
 
-            int len = trkpts.getLength();
-            points = new ArrayList<>(len);
+        int len = trkpts.getLength();
+        points = new ArrayList<>(len);
 
 
-            for (int i = 0; i < len; i++) {
-                Node trkpt = trkpts.item(i);
-                Element trkptElm = (Element) trkpt;
+        for (int i = 0; i < len; i++) {
+            Node trkpt = trkpts.item(i);
+            Element trkptElm = (Element) trkpt;
 
-                NodeList times = trkptElm.getElementsByTagName("time");
+            NodeList times = trkptElm.getElementsByTagName("time");
 
-                Point point = new Point();
-                point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
-                point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
-                point.setTime(convertToDateTime(times.item(0).getTextContent()));
+            Point point = new Point();
+            point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
+            point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
+            if (times.getLength() == 0) {
+                throw new Exception("轨迹文件缺少时间");
+            }
+            String ts = times.item(0).getTextContent();
+            if (Objects.equals(ts, "")) {
+                throw new Exception("轨迹文件缺少时间");
+            }
+            DateTime dateTime = convertToDateTime(ts);
+            if (dateTime == null) {
+                throw new Exception("时间解析失败");
+            }
+            point.setTime(dateTime);
 
-                point.setEle(parserEle(trkptElm));
-                point.setSpeed(parserSpeed(trkptElm));
+            point.setEle(parserEle(trkptElm));
+            point.setSpeed(parserSpeed(trkptElm));
 
-                NodeList extensions = trkptElm.getElementsByTagName("extensions");
-                if (extensions.getLength() > 0) {
-                    Element extNode = (Element) extensions.item(0);
+            NodeList extensions = trkptElm.getElementsByTagName("extensions");
+            if (extensions.getLength() > 0) {
+                Element extNode = (Element) extensions.item(0);
 
-                    String hr = getTagByName(extNode, pointExtNs, "hr");
-                    if (hr != null) {
-                        try {
-                            point.setHr(Short.parseShort(hr));
-                        } catch (NumberFormatException ignore) {
-                        }
-                    }
-
-                    String cad = getTagByName(extNode, pointExtNs, "cad", "cadence");
-                    if (cad != null) {
-                        try {
-                            point.setCadence(Short.parseShort(cad));
-                        } catch (NumberFormatException ignore) {
-                        }
-                    }
-
-                    String speed = getTagByName(extNode, pointExtNs, "speed");
-                    if (speed != null) {
-                        try {
-                            point.setSpeed(Float.parseFloat(speed));
-                        } catch (NumberFormatException ignore) {
-                        }
+                String hr = getTagByName(extNode, pointExtNs, "hr");
+                if (hr != null) {
+                    try {
+                        point.setHr(Short.parseShort(hr));
+                    } catch (NumberFormatException ignore) {
                     }
                 }
 
-                if (i != 0) {
-                    Point prePoint = points.get(i - 1);
-                    float subDistance = point.calculateDistance(prePoint);
-                    distance = distance + subDistance;
-                    long subTs = point.subTs(prePoint);
-
-                    if (subTs < 60) {
-                        totalMovingTime = totalMovingTime + subTs;
+                String cad = getTagByName(extNode, pointExtNs, "cad", "cadence");
+                if (cad != null) {
+                    try {
+                        point.setCadence(Short.parseShort(cad));
+                    } catch (NumberFormatException ignore) {
                     }
                 }
 
-                point.setDistance(distance);
-
-                //todo with extensions
-                points.add(point);
+                String speed = getTagByName(extNode, pointExtNs, "speed");
+                if (speed != null) {
+                    try {
+                        point.setSpeed(Float.parseFloat(speed));
+                    } catch (NumberFormatException ignore) {
+                    }
+                }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            if (i != 0) {
+                Point prePoint = points.get(i - 1);
+                float subDistance = point.calculateDistance(prePoint);
+                distance = distance + subDistance;
+                long subTs = point.subTs(prePoint);
+
+                if (subTs < 60) {
+                    totalMovingTime = totalMovingTime + subTs;
+                }
+            }
+
+            point.setDistance(distance);
+
+            //todo with extensions
+            points.add(point);
+        }
+
+        if (points.size() == 0) {
+            throw new Exception("请检查文件 没有轨迹点数据");
         }
 
         DateTime startTime = points.get(0).getTime();

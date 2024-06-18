@@ -19,7 +19,7 @@ public class App {
 
     static int degree = 11930465;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int argsLen = args.length;
         if (argsLen == 0) {
             System.out.println("java -jar gpx2fit.jar xxx.gpx");
