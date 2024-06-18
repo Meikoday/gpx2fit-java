@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.garmin.fit.DateTime;
 import com.garmin.fit.Sport;
+import com.yangyang5214.gpx2fit.HappyException;
 import com.yangyang5214.gpx2fit.model.Point;
 import com.yangyang5214.gpx2fit.model.Session;
 import org.w3c.dom.*;
@@ -82,15 +83,15 @@ public class GpxParser {
             point.setLon(Double.parseDouble(trkptElm.getAttribute("lon")));
             point.setLat(Double.parseDouble(trkptElm.getAttribute("lat")));
             if (times.getLength() == 0) {
-                throw new Exception("轨迹文件缺少时间");
+                throw new HappyException("轨迹文件缺少时间");
             }
             String ts = times.item(0).getTextContent();
             if (Objects.equals(ts, "")) {
-                throw new Exception("轨迹文件缺少时间");
+                throw new HappyException("轨迹文件缺少时间");
             }
             DateTime dateTime = convertToDateTime(ts);
             if (dateTime == null) {
-                throw new Exception("时间解析失败");
+                throw new HappyException("时间解析失败");
             }
             point.setTime(dateTime);
 
@@ -144,7 +145,7 @@ public class GpxParser {
         }
 
         if (points.size() == 0) {
-            throw new Exception("请检查文件 没有轨迹点数据");
+            throw new HappyException("文件问题.未找到轨迹点数据");
         }
 
         DateTime startTime = points.get(0).getTime();
