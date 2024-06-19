@@ -75,6 +75,8 @@ public class App {
         developerIdMesg.setApplicationVersion((long) (1.0 * 100));
         messages.add(developerIdMesg);
 
+        Float maxSpeed = new Float(0);
+
         for (Point point : points) {
             RecordMesg recordMesg = new RecordMesg();
             recordMesg.setTimestamp(point.getTime());
@@ -87,6 +89,10 @@ public class App {
             recordMesg.setCadence(point.getCadence());
             recordMesg.setSpeed(point.getSpeed());
 //            recordMesg.setPower(((short) (i % 255) < 157 ? 150 : 250)); //Square
+
+            if (point.getSpeed() > maxSpeed) {
+                maxSpeed = point.getSpeed();
+            }
 
             messages.add(recordMesg);
         }
@@ -116,6 +122,8 @@ public class App {
         sessionMesg.setTimestamp(startTime);
         sessionMesg.setStartTime(startTime);
         sessionMesg.setTotalDistance(session.getTotalDistance());
+        sessionMesg.setAvgSpeed(session.getTotalDistance() / session.getTotalMovingTime());
+        sessionMesg.setMaxSpeed(maxSpeed);
 
         sessionMesg.setTotalElapsedTime((session.getTotalElapsedTime()));
         sessionMesg.setTotalMovingTime((session.getTotalMovingTime()));
