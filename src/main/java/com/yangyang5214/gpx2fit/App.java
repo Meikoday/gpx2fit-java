@@ -75,7 +75,7 @@ public class App {
         developerIdMesg.setApplicationVersion((long) (1.0 * 100));
         messages.add(developerIdMesg);
 
-        Float maxSpeed = new Float(0);
+        Float maxSpeed = (float) 0;
 
         for (Point point : points) {
             RecordMesg recordMesg = new RecordMesg();
