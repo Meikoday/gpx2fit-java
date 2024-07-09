@@ -209,9 +209,17 @@ public class GpxParser {
 
     public Float parserEle(Element trkptElm) {
         NodeList eles = trkptElm.getElementsByTagName("ele");
+        return getaFloat(eles);
+    }
+
+    private Float getaFloat(NodeList eles) {
         Node elvNode = eles.item(0);
         if (elvNode != null && !Objects.equals(elvNode.getTextContent(), "")) {
-            return Float.parseFloat(elvNode.getTextContent());
+            try {
+                return Float.parseFloat(elvNode.getTextContent());
+            } catch (Exception e) {
+                return (float) 0;
+            }
         } else {
             return (float) 0;
         }
@@ -219,12 +227,7 @@ public class GpxParser {
 
     public Float parserSpeed(Element trkptElm) {
         NodeList eles = trkptElm.getElementsByTagName("speed");
-        Node speedNode = eles.item(0);
-        if (speedNode != null && !Objects.equals(speedNode.getTextContent(), "")) {
-            return Float.parseFloat(speedNode.getTextContent());
-        } else {
-            return (float) 0;
-        }
+        return getaFloat(eles);
     }
 
     public Sport getSport(Document document) {
